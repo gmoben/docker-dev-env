@@ -1,0 +1,3 @@
+FROM gmoben/dev-env:manjaro-base
+
+RUN pacaur -S emacs-nox
