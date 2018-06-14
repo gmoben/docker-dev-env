@@ -32,9 +32,9 @@ function manjaro() {
     fi
 
     newdir $rootfs
-    sudo basestrap -cdGM $rootfs filesystem pacman pacaur base-devel procps psmisc strace
+    sudo basestrap -cdGM $rootfs filesystem base-devel pacaur gnupg
 
-    sudo sh -c "cat $rootfs/etc/pacman.d/mirrorlist | grep -i -A2 --no-group-separator United_States > $rootfs/etc/pacman.d/mirrorlist"
+    # sudo wget -O $rootfs/usr/bin/systemctl https://raw.githubusercontent.com/gdraheim/docker-systemctl-replacement/master/files/docker/systemctl.py && sudo chmod a+x $rootfs/usr/bin/systemctl
 
     if [[ -f $rootfs.tar ]]; then
 	sudo rm -rf $rootfs.tar

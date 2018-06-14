@@ -1,25 +1,55 @@
-ARCH_ROOTFS=arch_rootfs
 MANJARO_ROOTFS=manjaro_rootfs
 
 IMAGE=gmoben/dev-env
-MANJARO_TAG=manjaro
-MANJARO_BASE_TAG=${MANJARO_TAG}-base
 
-.PHONY: clean build manjaro _manjaro manjaro_base
+BASE=${IMAGE}:base
+MINIMAL=${IMAGE}:minimal
+EMACS=${IMAGE}:emacs
+WITH_USER=${IMAGE}:${USER}
+
+.PHONY: clean build base minimal emacs full run run_minimal run_emacs
 
 clean:
 	sudo rm -rf ${MANJARO_ROOTFS}*
 
-build: manjaro
+build:
+	docker pull ${BASE} || ${MAKE} base
+	${MAKE} minimal
 
-manjaro: manjaro_base _manjaro
+push:
+	docker push ${BASE}
 
-_manjaro:
+base:
+	@./bin/prepare_fs.sh manjaro ${MANJARO_ROOTFS}
+	docker import ${MANJARO_ROOTFS}.tar ${BASE}
+
+minimal:
 	docker build \
-		-t ${IMAGE}:${MANJARO_TAG} \
-		-f Dockerfile.manjaro \
+		--build-arg user=${USER} \
+		-t ${MINIMAL} \
+		-t ${WITH_USER} \
+		-f Dockerfile.minimal \
 		.
 
-manjaro_base:
-	@./bin/prepare_fs.sh manjaro ${MANJARO_ROOTFS}
-	docker import ${MANJARO_ROOTFS}.tar ${IMAGE}:${MANJARO_BASE_TAG}
+emacs:
+	docker build \
+		--build-arg user=${USER} \
+		-t ${EMACS} \
+		-f Dockerfile.emacs \
+		.
+
+full: base minimal emacs
+
+run: run_user
+
+run_user:
+	docker run --rm -it \
+		-v ${HOME}/.gnupg:${HOME}/.gnupg \
+		-v ${HOME}/.ssh:${HOME}/.ssh \
+		${WITH_USER}
+
+run_emacs:
+	docker run --rm -it \
+		-v ${HOME}/.gnupg:${HOME}/.gnupg \
+		-v ${HOME}/.ssh:${HOME}/.ssh \
+		${EMACS}

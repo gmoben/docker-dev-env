@@ -1,0 +1,46 @@
+FROM gmoben/dev-env:manjaro-base
+
+ARG user
+
+RUN systemctl enable --user gpg-agent
+
+RUN pacman-key --init && \
+    pacman-key --populate archlinux manjaro
+
+RUN pacman-mirrors -c United_States
+
+RUN pacman -Sy --noconfirm \
+openssh \
+python-pip \
+python2 \
+python2-pip \
+go \
+zip \
+unzip \
+zsh \
+procps \
+psmisc \
+strace \
+wget
+
+RUN pip install \
+virtualenv \
+virtualenvwrapper
+
+RUN mkdir /code && mkdir /code/go
+RUN chmod -R a+rw /code
+
+COPY dotfiles /dotfiles
+
+RUN ln -s /dotfiles/.aliases /root/.aliases
+RUN ln -s /dotfiles/.extend.profile /root/.profile
+RUN ln -s /dotfiles/.zshrc /root/.zshrc
+
+RUN groupadd $user && useradd --create-home --home-dir /home/$user -g $user $user
+USER $user
+RUN ln -s /dotfiles/.aliases /home/$user/.aliases
+RUN ln -s /dotfiles/.extend.profile /home/$user/.profile
+RUN ln -s /dotfiles/.zshrc /home/$user/.zshrc
+
+WORKDIR /home/$user
+CMD gpg -K && bash
