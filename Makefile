@@ -5,7 +5,12 @@ IMAGE=gmoben/dev-env
 MANJARO_TAG=manjaro
 MANJARO_BASE_TAG=${MANJARO_TAG}-base
 
-.PHONY: build manjaro manjaro_base
+.PHONY: clean build manjaro _manjaro manjaro_base
+
+clean:
+	sudo rm -rf ${MANJARO_ROOTFS}*
+
+build: manjaro
 
 manjaro: manjaro_base _manjaro
 

@@ -32,7 +32,7 @@ function manjaro() {
     fi
 
     newdir $rootfs
-    sudo basestrap -cdGM $rootfs filesystem pacman pacaur
+    sudo basestrap -cdGM $rootfs filesystem pacman pacaur base-devel procps psmisc strace
 
     sudo sh -c "cat $rootfs/etc/pacman.d/mirrorlist | grep -i -A2 --no-group-separator United_States > $rootfs/etc/pacman.d/mirrorlist"
 

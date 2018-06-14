@@ -1,3 +1,12 @@
 FROM gmoben/dev-env:manjaro-base
 
-RUN pacaur -S emacs-nox
+RUN pacman-key --init && \
+    pacman-key --populate archlinux manjaro
+
+RUN pacman -Sy --noconfirm \
+openssh \
+emacs-nox \
+python-pip \
+python2 \
+python2-pip \
+go
