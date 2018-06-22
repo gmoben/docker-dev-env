@@ -10,6 +10,7 @@ RUN pacman-key --init && \
 RUN pacman-mirrors -c United_States
 
 RUN pacman -Sy --noconfirm \
+emacs-nox \
 openssh \
 python-pip \
 python2 \
@@ -21,26 +22,40 @@ zsh \
 procps \
 psmisc \
 strace \
-wget
+wget \
+mlocate
 
 RUN pip install \
 virtualenv \
 virtualenvwrapper
 
-RUN mkdir /code && mkdir /code/go
-RUN chmod -R a+rw /code
+RUN mkdir /code && mkdir /code/go && chmod -R a+rw /code
 
 COPY dotfiles /dotfiles
 
-RUN ln -s /dotfiles/.aliases /root/.aliases
-RUN ln -s /dotfiles/.extend.profile /root/.profile
-RUN ln -s /dotfiles/.zshrc /root/.zshrc
+RUN ln -s /dotfiles/.aliases /root/.aliases && \
+ln -s /dotfiles/.extend.profile /root/.profile && \
+ln -s /dotfiles/.zshrc /root/.zshrc
 
-RUN groupadd $user && useradd --create-home --home-dir /home/$user -g $user $user
+RUN echo "%sudo ALL=(ALL) ALL" >> /etc/sudoers
+RUN groupadd $user && \
+groupadd sudo && \
+useradd --create-home --home-dir /home/$user -g $user $user && \
+usermod -a -G sudo $user && \
+echo -e "password\npassword" | passwd $user
+
+RUN mkdir -m 700 /home/$user/.gnupg/
+COPY conf/.gnupg/* /home/$user/.gnupg/
+RUN chown -R $user:$user /home/$user/.gnupg/
+
 USER $user
-RUN ln -s /dotfiles/.aliases /home/$user/.aliases
-RUN ln -s /dotfiles/.extend.profile /home/$user/.profile
-RUN ln -s /dotfiles/.zshrc /home/$user/.zshrc
+RUN ln -s /dotfiles/.aliases /home/$user/.aliases && \
+ln -s /dotfiles/.extend.profile /home/$user/.profile && \
+ln -s /dotfiles/.zshrc /home/$user/.zshrc
+
+RUN echo "export GPG_TTY=\"\$(tty)\" \
+export EDITOR=\"vi\" \
+export VISUAL=\"vi\"" >> /home/$user/.bashrc
 
 WORKDIR /home/$user
 CMD gpg -K && bash

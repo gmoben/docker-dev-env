@@ -7,7 +7,7 @@ MINIMAL=${IMAGE}:minimal
 EMACS=${IMAGE}:emacs
 WITH_USER=${IMAGE}:${USER}
 
-.PHONY: clean build base minimal emacs full run run_minimal run_emacs
+.PHONY: clean build base minimal emacs full run run_user run_emacs
 
 clean:
 	sudo rm -rf ${MANJARO_ROOTFS}*
@@ -44,12 +44,14 @@ run: run_user
 
 run_user:
 	docker run --rm -it \
-		-v ${HOME}/.gnupg:${HOME}/.gnupg \
-		-v ${HOME}/.ssh:${HOME}/.ssh \
+		-v ${HOME}/.gnupg/private-keys-v1.d:/home/${USER}/.gnupg/private-keys-v1.d \
+		-v ${HOME}/.gnupg/pubring.kbx:/home/${USER}/.gnupg/pubring.kbx \
+		-v ${HOME}/.ssh:/home/${USER}/.ssh \
 		${WITH_USER}
 
 run_emacs:
 	docker run --rm -it \
-		-v ${HOME}/.gnupg:${HOME}/.gnupg \
-		-v ${HOME}/.ssh:${HOME}/.ssh \
+		-v ${HOME}/.gnupg/private-keys-v1.d:/home/${USER}/.gnupg/private-keys-v1.d \
+		-v ${HOME}/.gnupg/pubring.kbx:/home/${USER}/.gnupg/pubring.kbx \
+		-v ${HOME}/.ssh:/home/${USER}/.ssh \
 		${EMACS}

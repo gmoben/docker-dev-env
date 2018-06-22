@@ -4,8 +4,6 @@ ARG user
 
 USER root
 
-RUN pacman -S emacs-nox
-
 RUN cp /dotfiles/.config/systemd/user/emacs.service /usr/lib/systemd/system/emacs.service
 RUN mkdir /dotfiles/.emacs.d/emms
 # RUN ln -s /dotfiles/.emacs.conf /root/.emacs.conf
