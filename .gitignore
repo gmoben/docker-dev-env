@@ -1,3 +1,6 @@
 build/
 *_rootfs/
 *_rootfs.*
+__pycache__
+*.pyc
+*.egg-info

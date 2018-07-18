@@ -44,6 +44,18 @@ useradd --create-home --home-dir /home/$user -g $user $user && \
 usermod -a -G sudo $user && \
 echo -e "password\npassword" | passwd $user
 
+# Install kubectl-bin v1.10.5-1 manually
+RUN cd /tmp && \
+git clone https://aur.archlinux.org/kubectl-bin.git && \
+chmod a+rwx kubectl-bin && \
+chown $user:$user /tmp/kubectl-bin && \
+cd kubectl-bin && \
+git reset --hard 728af9affb342156c7034a5da53f0f0c2719a141 && \
+sudo -u $user makepkg && \
+find /tmp/kubectl-bin -name *.tar.xz | xargs pacman -U --noconfirm && \
+cd /tmp && rm -rf kubectl-bin
+
+
 RUN mkdir -m 700 /home/$user/.gnupg/
 COPY conf/.gnupg/* /home/$user/.gnupg/
 RUN chown -R $user:$user /home/$user/.gnupg/
@@ -53,9 +65,12 @@ RUN ln -s /dotfiles/.aliases /home/$user/.aliases && \
 ln -s /dotfiles/.extend.profile /home/$user/.profile && \
 ln -s /dotfiles/.zshrc /home/$user/.zshrc
 
-RUN echo "export GPG_TTY=\"\$(tty)\" \
-export EDITOR=\"vi\" \
-export VISUAL=\"vi\"" >> /home/$user/.bashrc
+RUN echo 'export GPG_TTY="$(tty)"' >> /home/$user/.bashrc && \
+echo 'export EDITOR="emacs"' >> /home/$user/.bashrc && \
+echo 'export VISUAL="emacs"' >> /home/$user/.bashrc
 
 WORKDIR /home/$user
+
+COPY pybin/ pybin/
+
 CMD gpg -K && bash

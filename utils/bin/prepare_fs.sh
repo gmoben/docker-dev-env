@@ -1,30 +1,11 @@
-function expect() {
-    cmd=$1
-    failure_msg=$2
-    return_code=$3
+#/bin/env bash
 
-    if [[ `echo $return_code` == "" ]]; then
-	return_code=0
-    fi
+readonly BIN_DIR=$(cd "$(dirname "$0")" > /dev/null && pwd -P)
+source "${BIN_DIR}/utils.sh"
 
-    `eval $cmd &> /dev/null`
-    if [[ $? -ne $return_code ]]; then
-	echo $failure_msg
-	exit 1
-    fi
-}
-
-function newdir() {
-    dirname=$1
-    if [[ -d $dirname ]]; then
-	sudo rm -rf $dirname
-    fi
-    mkdir -p $dirname
-}
 
 function manjaro() {
-    expect "uname -a | grep -i manjaro" "Manjaro is not the current platform"
-    expect "pacman -Qs manjaro-tools-base" "Missing package: manjaro-tools-base"
+    expect_manjaro
 
     rootfs=$1
     if [[ $rootfs == "" ]]; then
