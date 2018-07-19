@@ -21,7 +21,7 @@ function expect_package() {
 }
 
 function expect_manjaro() {
-    expect "uname -a | grep -i manjaro" "Manjaro is not the current platform"
+    expect "uname -r | grep -i manjaro" "Manjaro is not the current platform"
     expect_package manjaro-release
     expect_package manjaro-tools-base
 }
