@@ -1,6 +1,6 @@
 MANJARO_ROOTFS=manjaro_rootfs
 
-IMAGE=gmoben/dev-env
+IMAGE=gmoben/manjaro
 
 BASE=${IMAGE}:base
 MINIMAL=${IMAGE}:minimal
@@ -20,7 +20,7 @@ push:
 	docker push ${BASE}
 
 base:
-	@./bin/prepare_fs.sh manjaro ${MANJARO_ROOTFS}
+	@./utils/bin/prepare_fs.sh manjaro ${MANJARO_ROOTFS}
 	docker import ${MANJARO_ROOTFS}.tar ${BASE}
 
 minimal:
@@ -28,6 +28,7 @@ minimal:
 		--build-arg user=${USER} \
 		-t ${MINIMAL} \
 		-t ${WITH_USER} \
+		--no-cache \
 		-f Dockerfile.minimal \
 		.
 
@@ -47,6 +48,8 @@ run_user:
 		-v ${HOME}/.gnupg/private-keys-v1.d:/home/${USER}/.gnupg/private-keys-v1.d \
 		-v ${HOME}/.gnupg/pubring.kbx:/home/${USER}/.gnupg/pubring.kbx \
 		-v ${HOME}/.ssh:/home/${USER}/.ssh \
+		-v ${HOME}/.kube:/home/${USER}/.kube \
+		-v /code/work:/code/work \
 		${WITH_USER}
 
 run_emacs:
@@ -54,4 +57,6 @@ run_emacs:
 		-v ${HOME}/.gnupg/private-keys-v1.d:/home/${USER}/.gnupg/private-keys-v1.d \
 		-v ${HOME}/.gnupg/pubring.kbx:/home/${USER}/.gnupg/pubring.kbx \
 		-v ${HOME}/.ssh:/home/${USER}/.ssh \
+		-v ${HOME}/.kube:/home/${USER}/.kube \
+		-v /code/work:/code/work \
 		${EMACS}

@@ -1,4 +1,4 @@
-FROM gmoben/dev-env:minimal
+FROM gmoben/manjaro:minimal
 
 ARG user
 

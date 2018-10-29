@@ -125,7 +125,7 @@ class GitTool(object):
     """Utility class containing methods for manipulating and analyzing Git repositories"""
 
     @staticmethod
-    def commits(url, *fields, include_defaults=True, result_format='list', preserve=False, repo_dir=None):
+    def commits(url, *fields, include_defaults=True, result_format='list', preserve=False, repo_dir=None, limit=None):
         """Retrieve commit metadata from a remote git repository.
 
         :param string url: URL to the remote git repository.
@@ -160,6 +160,9 @@ class GitTool(object):
                 log.debug("Leaving local repository in place")
 
         log.debug("Finished extracting commit metadata", results=results)
+
+        if limit is not None:
+            return results[:limit]
         return results
 
     @staticmethod
@@ -173,7 +176,8 @@ class GitTool(object):
         authors = GitTool.commits(url, key, include_defaults=False, result_format='flat_list')
         counts = defaultdict(lambda: 0)
         for x in authors:
-            x = re.sub(r'@.+', '', x)
+            if key == 'author.email':
+                x = re.sub(r'@.+', '', x)
             counts[x] += 1
 
         return OrderedDict(reversed(sorted(counts.items(), key=lambda x: x[1])))

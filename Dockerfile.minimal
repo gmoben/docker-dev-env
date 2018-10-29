@@ -1,4 +1,4 @@
-FROM gmoben/dev-env:manjaro-base
+FROM gmoben/manjaro:base
 
 ARG user
 
@@ -12,6 +12,7 @@ RUN pacman-mirrors -c United_States
 RUN pacman -Sy --noconfirm \
 emacs-nox \
 openssh \
+python \
 python-pip \
 python2 \
 python2-pip \
@@ -60,6 +61,10 @@ RUN mkdir -m 700 /home/$user/.gnupg/
 COPY conf/.gnupg/* /home/$user/.gnupg/
 RUN chown -R $user:$user /home/$user/.gnupg/
 
+COPY utils/ /utils/
+RUN pip install -r /utils/requirements.txt && \
+cd utils && python setup.py develop
+
 USER $user
 RUN ln -s /dotfiles/.aliases /home/$user/.aliases && \
 ln -s /dotfiles/.extend.profile /home/$user/.profile && \
@@ -70,7 +75,5 @@ echo 'export EDITOR="emacs"' >> /home/$user/.bashrc && \
 echo 'export VISUAL="emacs"' >> /home/$user/.bashrc
 
 WORKDIR /home/$user
-
-COPY pybin/ pybin/
 
 CMD gpg -K && bash
